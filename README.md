@@ -8,4 +8,4 @@ Run modes:
 
 Rollbar username, password, account slug & project name can be read from environment variables
 Automatic login only works with disabled MFA
-At first run please provide the location of your chromedriver. You may download chromedriver [here](https://chromedriver.chromium.org/).
+At first run please provide the location of your chromedriver. You may download chromedriver from [here](https://chromedriver.chromium.org/).
