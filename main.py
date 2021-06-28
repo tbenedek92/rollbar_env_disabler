@@ -4,6 +4,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 import os
 import csv
+from time import sleep
 
 
 '''
@@ -52,7 +53,7 @@ def open_env_page(driver, desired_state_dict):
     driver.get(f'https://rollbar.com/{ROLLBAR_ACCOUNT}/{ROLLBAR_PROJECT}/settings/environments/')
     wait = ui.WebDriverWait(driver, 10) # timeout after 10 seconds
     results = wait.until(lambda driver: driver.find_elements_by_id('Environments'))
-
+    sleep(8)
     table_id = driver.find_element(By.ID, 'Environments')
     rows = table_id.find_elements(By.TAG_NAME, "tr")
     rows.pop(0)     # dropping the header of the table
