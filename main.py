@@ -81,6 +81,8 @@ def click_action_logic(desired_state_dict, env_name, env_current_state):
     elif RUN_MODE == 2:
         if env_name not in desired_state_dict.keys() and env_current_state.lower() != 'hidden':
             return True
+        if env_name not in desired_state_dict.keys() and env_current_state.lower() == 'hidden':
+            return False
         if desired_state_dict[env_name] == env_current_state:
             return False
         else:
@@ -88,6 +90,8 @@ def click_action_logic(desired_state_dict, env_name, env_current_state):
     elif RUN_MODE == 3:
         if env_name not in desired_state_dict.keys() and env_current_state.lower() != 'visible':
             return True
+        if env_name not in desired_state_dict.keys() and env_current_state.lower() == 'visible':
+            return False
         if desired_state_dict[env_name] == env_current_state:
             return False
         else:
