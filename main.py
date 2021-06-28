@@ -57,6 +57,11 @@ def open_env_page(driver, desired_state_dict):
     table_id = driver.find_element(By.ID, 'Environments')
     rows = table_id.find_elements(By.TAG_NAME, "tr")
     rows.pop(0)     # dropping the header of the table
+    counter = 0
+    f = open('result.csv', 'w')
+    writer = csv.writer(f)
+    header = ['environment, original_state, new_state']
+    writer.writerow(header)
     for row in rows:
         row_text = repr(row.text).partition('\\n')
         env_name = row_text[0][1:]
@@ -65,9 +70,17 @@ def open_env_page(driver, desired_state_dict):
         click_action_required = click_action_logic(desired_state_dict, env_name, env_current_state)
 
         if click_action_required:
+
             btn = row.find_elements(By.CLASS_NAME, "toggle-btn")[0]
             btn.click()
+            env_new_state = set_new_state(env_current_state)
 
+            row = [env_name, env_current_state, env_new_state]
+            writer.writerow(header)
+
+        counter += 1
+        print(f'{counter}/{len(rows)} environemnts set to the desired state')
+    f.close()
 
 def click_action_logic(desired_state_dict, env_name, env_current_state):
     if RUN_MODE == 1:
@@ -97,6 +110,7 @@ def click_action_logic(desired_state_dict, env_name, env_current_state):
         else:
             return True
 
+
 def rb_sign_in(driver):
     driver.get('https://rollbar.com/login')
     ui.WebDriverWait(driver, 10) # timeout after 10 seconds
@@ -109,9 +123,17 @@ def rb_sign_in(driver):
         passsword_field.send_keys(ROLLBAR_PASSWORD)
         passsword_field.submit()
     else:
-        input('Please login to Rollbar with your credentials, then press Enter to continue...')
+        input('Please login to Rollbar with your credentials, then press Enter to continue... \n')
 
     ui.WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "NavBar")))
+
+
+def set_new_state(env_current_state):
+    if env_current_state == 'hidden':
+        env_new_state = 'visible'
+    elif env_current_state == 'visible':
+        env_new_state = 'hidden'
+    return env_new_state
 
 
 def set_credentials_from_env_vars():
@@ -121,12 +143,12 @@ def set_credentials_from_env_vars():
     try:
         ROLLBAR_USERNAME = os.environ['ROLLBAR_USERNAME']
     except KeyError:
-        print('ROLLBAR_USERNAME environment variable is not set, manual login triggered.')
+        print('ROLLBAR_USERNAME environment variable is not set, manual login triggered. \n')
         return
     try:
         ROLLBAR_PASSWORD = os.environ['ROLLBAR_PASSWORD']
     except KeyError:
-        print('ROLLBAR_PASSWORD environment variable is not set, manual login triggered.')
+        print('ROLLBAR_PASSWORD environment variable is not set, manual login triggered. \n')
 
 
 def set_account_project():
@@ -137,12 +159,12 @@ def set_account_project():
         ROLLBAR_ACCOUNT = os.environ['ROLLBAR_ACCOUNT']
     except KeyError:
         ROLLBAR_ACCOUNT = input('Please provide your Rollbar account slug. If you login to your Rollbar account, '
-                                'you may copy it from the URL  https://rollbar.com/{yourrollbaraccountslug}')
+                                'you may copy it from the URL  https://rollbar.com/{yourrollbaraccountslug} \n')
     try:
         ROLLBAR_PROJECT = os.environ['ROLLBAR_PROJECT']
     except KeyError:
         ROLLBAR_PROJECT = input("Please provide your Rollbar project's slug. You can check it in the following url"
-                                "https://rollbar.com/{yourrollbaraccountslug}/settings/projects")
+                                "https://rollbar.com/{yourrollbaraccountslug}/settings/projects \n")
 
 
 
@@ -153,7 +175,7 @@ def set_run_mode():
     print('Please select a run mode: \n'
           ' 1.  Set only the envs listed in the csv, to the given values in the csv \n'
           ' 2.  Hide everything, except what is set to unhide in the csv \n'
-          ' 3.  Unhide everything, except what is set to hide in the csv')
+          ' 3.  Unhide everything, except what is set to hide in the csv \n')
     run_mode_temp = input()
     run_mode_verification_failed = True
     while run_mode_verification_failed:
@@ -189,3 +211,4 @@ if __name__ == '__main__':
     driver = open_webdriver()
     rb_sign_in(driver)
     open_env_page(driver, desired_state_dict)
+    driver.close()
