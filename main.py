@@ -150,9 +150,9 @@ def set_account_project():
 def set_run_mode():
     global RUN_MODE
 
-    print('Please select a run mode:'
-          ' 1.  Set only the envs listed in the csv, to the given values in the csv'
-          ' 2.  Hide everything, except what is set to unhide in the csv'
+    print('Please select a run mode: \n'
+          ' 1.  Set only the envs listed in the csv, to the given values in the csv \n'
+          ' 2.  Hide everything, except what is set to unhide in the csv \n'
           ' 3.  Unhide everything, except what is set to hide in the csv')
     run_mode_temp = input()
     run_mode_verification_failed = True
@@ -178,6 +178,7 @@ def read_csv(env_csv_file):
         csvfile.close()
     else:
         print('update_env.csv file does not exist. Please make sure to create one, before running the script.')
+        exit(0)
     return desired_state_dict
 
 if __name__ == '__main__':
